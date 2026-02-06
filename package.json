@@ -1,0 +1,40 @@
+{
+  "name": "crypto-scanner",
+  "version": "1.0.0",
+  "description": "Real-time cryptocurrency scanner tracking price movements, volume spikes, and market momentum across multiple exchanges",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "crypto",
+    "scanner",
+    "trading",
+    "bitcoin",
+    "ethereum",
+    "price-tracker",
+    "volume-analysis",
+    "market-scanner",
+    "coinbase",
+    "kraken",
+    "mexc",
+    "kucoin",
+    "real-time",
+    "dashboard"
+  ],
+  "author": "thor",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/crypto-scanner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/crypto-scanner/issues"
+  },
+  "homepage": "https://github.com/yourusername/crypto-scanner#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Scanner — Live Gainers, Losers & Volume</title>
+    <meta name="description" content="Real-time cryptocurrency scanner tracking top gainers, losers, and volume across Coinbase, MEXC, and KuCoin. Free, no login required.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%2300ff88' stroke-width='3'/><circle cx='50' cy='50' r='30' fill='none' stroke='%2300ff88' stroke-width='2' opacity='0.6'/><circle cx='50' cy='50' r='15' fill='none' stroke='%2300ff88' stroke-width='1.5' opacity='0.4'/><circle cx='50' cy='50' r='4' fill='%2300ff88'/><line x1='50' y1='50' x2='78' y2='28' stroke='%2300ff88' stroke-width='2.5' stroke-linecap='round'/><line x1='50' y1='5' x2='50' y2='15' stroke='%2300ff88' stroke-width='2'/><line x1='50' y1='85' x2='50' y2='95' stroke='%2300ff88' stroke-width='2'/><line x1='5' y1='50' x2='15' y2='50' stroke='%2300ff88' stroke-width='2'/><line x1='85' y1='50' x2='95' y2='50' stroke='%2300ff88' stroke-width='2'/></svg>">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loading Overlay (Feature #3) -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner-large">
+            <div class="spinner-large"></div>
+            <span>Loading scanner data...</span>
+        </div>
+    </div>
+
+    <!-- Top Controls Bar -->
+    <header class="controls-bar">
+        <div class="controls-left">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#00ff88" stroke-width="3"/>
+                    <circle cx="50" cy="50" r="30" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.6"/>
+                    <circle cx="50" cy="50" r="15" fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+                    <circle cx="50" cy="50" r="4" fill="#00ff88"/>
+                    <line x1="50" y1="50" x2="78" y2="28" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span>Crypto Scanner</span>
+            </div>
+            <!-- Feature #14: Theme toggle -->
+            <button id="themeToggle" class="btn btn-icon" title="Toggle theme">🌙</button>
+            <div class="control-group">
+                <label>Market</label>
+                <select id="marketFilter">
+                    <option value="USD">All USD Pairs</option>
+                    <option value="USDT">All USDT Pairs</option>
+                    <option value="USDC">All USDC Pairs</option>
+                    <option value="BTC">All BTC Pairs</option>
+                    <option value="ETH">All ETH Pairs</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Category</label>
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+            <!-- Feature #5: Results count -->
+            <div class="control-group">
+                <label>Show</label>
+                <select id="resultsCount">
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Interval</label>
+                <select id="updateInterval">
+                    <option value="5000">5s</option>
+                    <option value="10000">10s</option>
+                    <option value="20000" selected>20s</option>
+                    <option value="30000">30s</option>
+                    <option value="60000">60s</option>
+                </select>
+            </div>
+            <!-- Feature #4: Min Volume filter -->
+            <div class="control-group">
+                <label>Min Volume</label>
+                <select id="minVolumeFilter">
+                    <option value="0">All</option>
+                    <option value="1000">$1K</option>
+                    <option value="10000">$10K</option>
+                    <option value="100000">$100K</option>
+                    <option value="1000000">$1M</option>
+                    <option value="5000000" selected>$5M</option>
+                    <option value="10000000">$10M</option>
+                    <option value="50000000">$50M</option>
+                    <option value="100000000">$100M</option>
+                </select>
+            </div>
+            <div class="control-group search-group">
+                <label>Search</label>
+                <input type="text" id="symbolSearch" placeholder="e.g. BTC, ETH..." autocomplete="off">
+            </div>
+        </div>
+        <div class="controls-right">
+            <div class="exchange-selector">
+                <!-- Feature #11: All Exchanges option -->
+                <label><input type="radio" name="exchange" value="all" checked> All</label>
+                <label><input type="radio" name="exchange" value="coinbase"> Coinbase</label>
+                <label><input type="radio" name="exchange" value="kraken"> Kraken</label>
+                <label><input type="radio" name="exchange" value="mexc"> MEXC</label>
+                <label><input type="radio" name="exchange" value="kucoin"> KuCoin</label>
+            </div>
+            <div class="status-info">
+                <span id="pairsCount">0 pairs</span>
+                <span class="separator">|</span>
+                <span id="lastUpdated">Last updated: —</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- History Banner -->
+    <div id="historyBanner" class="history-banner" style="display:none;"></div>
+
+    <!-- Feature #12: Watchlist Section -->
+    <section class="watchlist-section" id="watchlistSection" style="display:none;">
+        <div class="watchlist-header" id="watchlistToggle">
+            <h2>⭐ Watchlist</h2>
+            <span class="watchlist-count" id="watchlistCount">0</span>
+            <span class="watchlist-chevron" id="watchlistChevron">▼</span>
+        </div>
+        <div class="watchlist-body" id="watchlistBody">
+            <div class="watchlist-items" id="watchlistItems"></div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-grid">
+        <!-- Top Gainers (dynamic split container) -->
+        <div class="split-container" id="gainersContainer" data-panel="gainers" data-header="green-header" data-icon="📈" data-title="Top Gainers"></div>
+
+        <!-- Top Losers (dynamic split container) -->
+        <div class="split-container" id="losersContainer" data-panel="losers" data-header="red-header" data-icon="📉" data-title="Top Losers"></div>
+
+        <!-- Volume Gainers + Unusual Volume (row) -->
+        <div class="split-container" id="volumeContainer" data-panel="volume" data-header="blue-header" data-icon="🔊" data-title="Top Volume Gainers"></div>
+
+        <section class="panel unusual-panel">
+            <div class="panel-header orange-header">
+                <h2>🔥 Unusual Volume</h2>
+            </div>
+            <div class="table-wrapper">
+                <table id="unusualTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="rank">#</th>
+                            <th data-sort="symbol">Symbol</th>
+                            <th data-sort="priceChange">Price %</th>
+                            <th data-sort="volChange">Vol Spike</th>
+                            <th data-sort="volume">24h Vol</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Momentum + Breakout Scanner (row) -->
+        <section class="panel momentum-panel">
+            <div class="panel-header purple-header">
+                <h2>⚡ Momentum</h2>
+            </div>
+            <div class="table-wrapper">
+                <table id="momentumTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="rank">#</th>
+                            <th data-sort="symbol">Symbol</th>
+                            <th data-sort="price">Price</th>
+                            <th data-sort="priceChange">Price %</th>
+                            <th data-sort="volChange">Vol %</th>
+                            <th data-sort="volume">24h Vol</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel breakout-panel">
+            <div class="panel-header cyan-header">
+                <h2>📈 Breakout Scanner</h2>
+            </div>
+            <div class="table-wrapper">
+                <table id="breakoutTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="rank">#</th>
+                            <th data-sort="symbol">Symbol</th>
+                            <th data-sort="price">Price</th>
+                            <th data-sort="priceChange">Price %</th>
+                            <th data-sort="volume">24h Vol</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- High/Low Tracker -->
+        <section class="panel highlow-panel">
+            <div class="panel-header yellow-header">
+                <h2>⚡ 24h High/Low</h2>
+                <select id="highlowFilter">
+                    <option value="both">Both</option>
+                    <option value="high">Highs Only</option>
+                    <option value="low">Lows Only</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table id="highlowTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="symbol">Symbol</th>
+                            <th data-sort="status">Status</th>
+                            <th data-sort="price">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Alerts Panel -->
+        <section class="panel alerts-panel">
+            <div class="panel-header purple-header">
+                <h2>🔔 Alerts</h2>
+                <div class="alert-controls">
+                    <!-- Feature #9: Sound toggle -->
+                    <button id="soundToggle" class="btn btn-icon" title="Toggle alert sounds">🔇</button>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="alertsEnabled" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <button id="configureAlerts" class="btn btn-sm">Configure</button>
+                    <!-- Feature #13: Export CSV -->
+                    <button id="exportAlerts" class="btn btn-sm" title="Export alerts to CSV">📥 Export</button>
+                </div>
+            </div>
+            <div class="alert-log" id="alertLog">
+                <div class="alert-empty">No alerts yet. Configure alert rules to get started.</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Alert Configuration Modal -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>⚙️ Alert Configuration</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-rule-form">
+                    <div class="form-row">
+                        <label>Alert when any coin moves more than</label>
+                        <div class="input-group">
+                            <input type="number" id="alertThreshold" value="5" min="0.1" step="0.1">
+                            <span>%</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>In timeframe</label>
+                        <select id="alertTimeframe">
+                            <option value="5m">5 minutes</option>
+                            <option value="15m" selected>15 minutes</option>
+                            <option value="30m">30 minutes</option>
+                            <option value="1h">1 hour</option>
+                            <option value="4h">4 hours</option>
+                            <option value="24h">24 hours</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Volume spike alert (% increase)</label>
+                        <div class="input-group">
+                            <input type="number" id="volAlertThreshold" value="200" min="10" step="10">
+                            <span>%</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" id="notifyDesktop" checked>
+                            Desktop notifications
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" id="alertHighLow" checked>
+                            Alert on new 24h High/Low
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="saveAlertConfig">Save Configuration</button>
+                    <button class="btn btn-danger" id="clearAlerts">Clear Alert Log</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <span>Crypto Scanner</span>
+        <span class="footer-sep">·</span>
+        <span>Data from Coinbase, Kraken, MEXC & KuCoin</span>
+        <span class="footer-sep">·</span>
+        <span>Not financial advice</span>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
