@@ -28,12 +28,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/crypto-scanner.git"
+    "url": "git+https://github.com/KevinSvenson/Crypto_Scanner.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/crypto-scanner/issues"
+    "url": "https://github.com/KevinSvenson/Crypto_Scanner/issues"
   },
-  "homepage": "https://github.com/yourusername/crypto-scanner#readme",
+  "homepage": "https://github.com/KevinSvenson/Crypto_Scanner#readme",
   "engines": {
     "node": ">=14.0.0"
   }

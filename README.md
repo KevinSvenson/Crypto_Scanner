@@ -37,8 +37,8 @@ A real-time cryptocurrency scanner and dashboard that tracks price movements, vo
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/crypto-scanner.git
-   cd crypto-scanner
+   git clone https://github.com/KevinSvenson/Crypto_Scanner.git
+   cd Crypto_Scanner
    ```
 
 2. **Start the server**

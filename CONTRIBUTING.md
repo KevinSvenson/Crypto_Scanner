@@ -37,8 +37,8 @@ Thank you for considering contributing to Crypto Scanner! This document provides
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/yourusername/crypto-scanner.git
-   cd crypto-scanner
+   git clone https://github.com/yourusername/Crypto_Scanner.git
+   cd Crypto_Scanner
    ```
 
 3. **Create a feature branch**
